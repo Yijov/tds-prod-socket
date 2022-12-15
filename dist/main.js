@@ -36,15 +36,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
 app.use("/api/v1", Router_1.default);
 io.on(events_1.default.CONNECTION, (socket) => {
-    console.log(socket.id + "has conected");
+    console.log(socket.id + " has conected");
+    io.to(socket.id).emit(events_1.default.UPDATE, TrackingCache.Track());
+    socket.on(events_1.default.GET_STATE, async () => {
+        let response = TrackingCache.Track();
+        io.to(socket.id).emit(events_1.default.UPDATE, response);
+    });
     socket.on(events_1.default.PING, (data) => {
         io.to(socket.id).emit(events_1.default.PONG, data);
     });
-    socket.on(events_1.default.TRIP_START, (tripDto) => {
+    socket.on(events_1.default.TRIP_START, async (tripDto) => {
         //add  tripp dto in memory
         try {
             TrackingCache.StartTrip(tripDto);
             io.to(socket.id).emit(events_1.default.TRIP_START_SUCCESS);
+            let response = await TrackingCache.Track();
+            socket.broadcast.emit(events_1.default.UPDATE, response);
         }
         catch (error) {
             io.to(socket.id).emit(events_1.default.TRIP_START_FAILED, error);

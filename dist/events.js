@@ -5,6 +5,7 @@ const EVENTS = {
     UPDATE: "update",
     PING: "ping",
     PONG: "pong",
+    GET_STATE: "get state",
     UPDATE_POSITION_FAILED: "update_position_failed",
     TRIP_START: "start_trip",
     TRIP_START_SUCCESS: "trip_started",
