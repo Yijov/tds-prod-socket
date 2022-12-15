@@ -12,6 +12,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const ErrorHandler_1 = __importDefault(require("./utils/ErrorHandler"));
 const cors = require("cors");
+const morgan = require("morgan");
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -23,17 +24,22 @@ const NODE_ENV = process.env.NODE_ENV;
 const io = socketIO(server, {
     cors: {
         origin: "*",
+        credentials: true,
         methods: ["GET", "POST"],
     },
 });
-app.use(cors("*"));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(morgan("dev"));
 app.use((0, helmet_1.default)());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
 app.use("/api/v1", Router_1.default);
 io.on(events_1.default.CONNECTION, (socket) => {
-    socket.on(events_1.default.PING, (data) => io.to(socket.id).emit(events_1.default.PONG, data));
+    console.log(socket.id + "has conected");
+    socket.on(events_1.default.PING, (data) => {
+        io.to(socket.id).emit(events_1.default.PONG, data);
+    });
     socket.on(events_1.default.TRIP_START, (tripDto) => {
         //add  tripp dto in memory
         try {
@@ -41,7 +47,7 @@ io.on(events_1.default.CONNECTION, (socket) => {
             io.to(socket.id).emit(events_1.default.TRIP_START_SUCCESS);
         }
         catch (error) {
-            io.to(socket.id).emit(events_1.default.TRIP_START_FAILED);
+            io.to(socket.id).emit(events_1.default.TRIP_START_FAILED, error);
         }
     });
     socket.on(events_1.default.TRIP_END, (tripId) => {
@@ -51,7 +57,7 @@ io.on(events_1.default.CONNECTION, (socket) => {
             io.to(socket.id).emit(events_1.default.TRIP_END_SUCCESS);
         }
         catch (error) {
-            io.to(socket.id).emit(events_1.default.TRIP_END_FAIL);
+            io.to(socket.id).emit(events_1.default.TRIP_END_FAIL, error);
         }
     });
     socket.on(events_1.default.UPDATE_POSITION, async (positionDto) => {
@@ -62,11 +68,11 @@ io.on(events_1.default.CONNECTION, (socket) => {
             socket.broadcast.emit(events_1.default.UPDATE, response);
         }
         catch (error) {
-            io.to(socket.id).emit(events_1.default.UPDATE_POSITION_FAILED);
+            io.to(socket.id).emit(events_1.default.UPDATE_POSITION_FAILED, error);
         }
     });
     socket.on(events_1.default.DISCONNECT, () => {
-        console.log("user disconnected");
+        console.log("user " + socket.id + " disconnected");
     });
 });
 app.use("*", ErrorHandler_1.default.NotFoundRouteHandler);
