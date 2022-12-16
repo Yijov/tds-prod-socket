@@ -12,8 +12,10 @@ class Tracker {
             this.trips.push(creted);
         };
         this.updateTripPosition = async (position) => {
-            let indexToUpdate = await this.trips.find((x) => x.Id === position.tripId);
-            await (indexToUpdate === null || indexToUpdate === void 0 ? void 0 : indexToUpdate.updatePosition(position));
+            await this.trips.forEach((elem) => {
+                if (elem.Id === position.tripId)
+                    elem.updatePosition(position);
+            });
         };
         this.Track = async () => {
             return await this.trips.map((t) => t.getTrackInfo());
