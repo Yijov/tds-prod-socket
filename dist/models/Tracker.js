@@ -12,15 +12,15 @@ class Tracker {
             this.trips.push(creted);
         };
         this.updateTripPosition = async (position) => {
-            let indexToUpdate = this.trips.findIndex(x => x.Id == position.tripId);
-            await this.trips[indexToUpdate].updatePosition(position);
+            let indexToUpdate = await this.trips.find((x) => x.Id === position.tripId);
+            await (indexToUpdate === null || indexToUpdate === void 0 ? void 0 : indexToUpdate.updatePosition(position));
         };
-        this.Track = () => {
-            return this.trips.map(t => t.getTrackInfo());
+        this.Track = async () => {
+            return await this.trips.map((t) => t.getTrackInfo());
         };
     }
     EndTrip(tripId) {
-        let indexToDelete = this.trips.findIndex(x => x.Id == tripId);
+        let indexToDelete = this.trips.findIndex((x) => x.Id == tripId);
         this.trips.splice(indexToDelete, 1);
     }
 }

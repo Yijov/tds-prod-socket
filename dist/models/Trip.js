@@ -7,7 +7,7 @@ class Trip {
         this.From = "ITLA";
         this.To = "27 de Feb";
         this.Position = { tripId: 0, lat: "", lon: "" };
-        this.getTrackInfo = () => {
+        this.getTrackInfo = async () => {
             let returnable = {
                 id: this.TripId,
                 route: this.RouteId,
