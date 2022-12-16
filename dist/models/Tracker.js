@@ -11,11 +11,10 @@ class Tracker {
             let creted = new Trip_1.default(trip);
             this.trips.push(creted);
         };
-        this.updateTripPosition = async (position) => {
-            await this.trips.forEach((elem) => {
-                if (elem.Id === position.tripId)
-                    elem.updatePosition(position);
-            });
+        this.updateTripPosition = (position) => {
+            var _a;
+            let indexToDelete = this.trips.findIndex((x) => x.Id == position.tripId);
+            (_a = this.trips[indexToDelete]) === null || _a === void 0 ? void 0 : _a.updatePosition(position);
         };
         this.Track = async () => {
             return await this.trips.map((t) => t.getTrackInfo());
